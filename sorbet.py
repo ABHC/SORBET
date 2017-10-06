@@ -16,7 +16,8 @@ database = sorbetBox.databaseConnection()
 
 print ("Welcome to PyHinge ! Please choose choose how to create your lattice hinge :\n")
 print ("1. Create a lattice hinge by minimizing the number of torsional legs required.")
-print ("2. Create a lattice hinge according to its intended radius.\n")
+print ("2. Create a lattice hinge according to its intended radius.")
+print ("3. Check the possibility of rotation.\n")
 
 modus = int(raw_input())
 print("\n")
@@ -69,6 +70,10 @@ elif modus == 2 :
 
 	modusOperandi.radiusMethod(shear_modulus, shear_stress)
 
+elif modus == 3 :
+
+	modusOperandi.advancedMethod(shear_modulus, shear_stress)
+
 else :
 
-	print("ERROR : Please select 1 or 2\n")
+	print("ERROR : Please select 1,2 or 3\n")
