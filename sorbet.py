@@ -17,7 +17,7 @@ database = sorbetBox.databaseConnection()
 print ("Welcome to PyHinge ! Please choose choose how to create your lattice hinge :\n")
 print ("1. Create a lattice hinge by minimizing the number of torsional legs required.")
 print ("2. Create a lattice hinge according to its intended radius.")
-print ("3. Check the possibility of rotation.\n")
+print ("3. Create a lattice hinge by minimizing the width of the hinge.\n")
 
 modus = int(raw_input())
 print("\n")
@@ -52,11 +52,11 @@ call_materials.close()
 #print (u'Vous avez choisi : '+unicode(material_spec[0])+u'\n')
 print (u'Your choice : '+unicode(material_spec[0])+u', '+unicode(material_spec[1])+'\n')
 
-shear_modulus = material_spec[2]
-shear_stress = material_spec[3]
+G = material_spec[2]
+tau = material_spec[3]
 
-print ('Shear modulus : '+str(shear_modulus)+' MPa')
-print ('Shear stress : '+str(shear_stress)+' MPa')
+print ('Shear modulus : '+str(G)+' MPa')
+print ('Shear stress : '+str(tau)+' MPa')
 
 #############################################
 ######### STEP 1.1 : GO TO THE CHOSEN MODUS OPERANDI
@@ -64,15 +64,15 @@ print ('Shear stress : '+str(shear_stress)+' MPa')
 
 if modus == 1 :
 
-	modusOperandi.classicMethod(shear_modulus, shear_stress)
+	modusOperandi.classicMethod(G, tau)
 
 elif modus == 2 :
 
-	modusOperandi.radiusMethod(shear_modulus, shear_stress)
+	modusOperandi.radiusMethod(G, tau)
 
 elif modus == 3 :
 
-	modusOperandi.advancedMethod(shear_modulus, shear_stress)
+	modusOperandi.methodW(G, tau)
 
 else :
 

@@ -5,6 +5,101 @@ import math
 
 import sorbetBox
 
+
+def coreCalculation(angle, G, tau, e, f, k, t, V, W):
+
+	#############################################
+	######### FIX VALUE
+	#############################################
+
+	n = 1
+
+	section_dimension = [t, e]
+	section_dimension.sort()
+	min_b = section_dimension[0]
+	sup_h = section_dimension[len(section_dimension)-1]
+
+	k_coefficients = sorbetBox.hbRelation(min_b, sup_h)
+	k1 = k_coefficients[0]
+	k2 = k_coefficients[1]
+
+	#############################################
+	######### RADIUS AND (FISRT) THETA CALCULATION
+	#############################################
+
+	R = (W/angle)
+	theta = angle/n
+	lmax = (1./2)*(V-(3*f))
+
+	#############################################
+	######### CHECK IF THE HINGE WIDTH DOESN'T EXCEED THE WITH DEFINED BY USER AND THE POSSIBILITY OF ROTATION
+	#############################################
+
+	while ((n*t)+((n+1)*k)) <= W and ((theta*(R-(e/2)))-(2*t)) >= 0:  # while Wn <= W and kinf >= 0
+		lmin = (k2*G*min_b*angle)/(n*k1*tau)
+		l = lmin
+		delta = 1
+
+	#############################################
+	######### CHECK IF l DOESN'T EXCEED lmax
+	#############################################
+
+		while l >= lmin:
+			l = (V-(2*delta*f)-f)/(2*delta)
+
+			if lmin <= l <= lmax:
+				print (u'delta: '+str(delta)+u'')
+				print (u'Number of legs : '+str(n)+u'')
+				print (u'Theta of each leg : '+str(math.degrees(theta))+u'°')
+				print (u'Legs length : '+str(l)+u' mm')
+				print (u'Hinge width : '+str(W)+u' mm\n')
+
+			delta = delta+1
+
+		n = n+1
+		theta = angle/n
+
+
+def methodW(G, tau):
+
+	#############################################
+	######### ASK USER SOME FIXED VALUES
+	#############################################
+
+	print ("\nSet the maximum opening angle in degrees :") #THETA majuscule
+	angle = float(raw_input())
+
+	print ("\nFix the width of the torsion leg (t) in mm : ") #t sur le schéma Lattice Hinge / h section
+	t = float(raw_input())
+
+	print ("\nFix the thickness of the torsion leg (e) in mm : ") #e sur le schéma Lattice Hinge / b section
+	e = float(raw_input())
+
+	print ("\nFix the leg clearance (k) in mm : ") #e sur le schéma Lattice Hinge / b section
+	k = float(raw_input())
+
+	print ("\nFix the total hinge length (V) in mm : ") #hinge LENGHT : largest side of the hinge plate = V
+	V = float(raw_input())
+
+	print ("\nFix the maximum width of the hinge (Wmax) in mm : ") #e sur le schéma Lattice Hinge / b section
+	Wmax = float(raw_input())
+
+	angle = math.radians(angle)
+
+	#############################################
+	######### Wmin AND f CALCULATION
+	#############################################
+
+	Wmin = (3*k+2*t)
+	f = (2*t)+k
+	step = 0.5
+	W = Wmin
+
+	while W <= Wmax:
+		coreCalculation(angle, G, tau, e, f, k, t, V, W)
+		W = W+step
+
+
 def classicMethod(shear_modulus, shear_stress):
 
 	#############################################
@@ -164,169 +259,3 @@ def radiusMethod(shear_modulus, shear_stress):
 	print (u'Theta : '+str(math.degrees(theta))+u'°')
 	print (u'Legs length : '+str(legs_length)+u' mm')
 	print (u'Hinge Width : '+str(hinge_width)+u' mm')
-
-
-def advancedMethod(shear_modulus, shear_stress):
-
-
-	#############################################
-	######### STEP 2 : CHOOSE THE VARIABLE VALUE
-	############################################
-
-	print ("1. The number of legs is variable.")
-	print ("2. The width of torsion leg is variable\n")
-
-	variable_option = int(raw_input())
-	print("\n")
-
-	#############################################
-	######### STEP 2 : FIX SOME VALUES
-	############################################
-
-	print ("\nSet the maximum opening angle in degrees :") #THETA majuscule
-	angle = float(raw_input())
-
-	angle = math.radians(angle)
-
-	if variable_option == 1:
-
-		print ("\nFix the radius of your hinge in mm : ") #rayon sur une vue de profil de la charnière
-		hinge_radius = float(raw_input())
-
-		print ("\nFix the width of the torsion leg in mm : ") #t sur le schéma Lattice Hinge / h section
-		legs_width = float(raw_input())
-
-		print ("\nFix the thickness of the torsion leg mm : \n") #e sur le schéma Lattice Hinge / b section
-		legs_thickness = float(raw_input())
-
-		print ("\nFix the minimum leg clearance you could accept in mm : \n") #e sur le schéma Lattice Hinge / b section
-		tolerance = float(raw_input())
-
-		print ("\nFix the maximal width of the hinge you could accept in mm : \n") #e sur le schéma Lattice Hinge / b section
-		target = int(raw_input())
-
-		#############################################
-		######### STEP 3 : CALCULATION OF THE h/b RELATION
-		############################################
-
-		section_dimension = [legs_width, legs_thickness]
-		section_dimension.sort()
-		min_b = section_dimension[0]
-		sup_h = section_dimension[len(section_dimension)-1]
-
-		k_coefficients = sorbetBox.hbRelation(min_b, sup_h)
-		k1 = k_coefficients[0]
-		k2 = k_coefficients[1]
-
-		#############################################
-		######### STEP 4 : CALCULATION OF THE POSSIBILITY OF ROTATION FOR THE NUMBER OF LEGS
-		############################################
-
-		num_legs = 1
-		legs_distance = tolerance+1
-
-		while legs_distance > tolerance:
-
-			theta = angle/num_legs
-			legs_distance = (theta*(hinge_radius-(legs_thickness/2)))-(2*legs_width) #calcul de kinf
-
-			#############################################
-			######### STEP 5 : CALCULATION OF THE TOTAL WIDTH OF THE HINGE
-			#############################################
-
-			hinge_width = (num_legs*legs_width)+((num_legs+1)*legs_distance)
-
-			#############################################
-			######### STEP 6 : CALCULATION OF THE TORSIONNAL LEGS LENGTH
-			#############################################
-
-			legs_length = (k2*shear_modulus*min_b*angle)/(num_legs*k1*shear_stress)
-
-			#############################################
-			######### STEP 7 : DISPLAY THE RESULTS
-			#############################################
-
-			if (target-5) <= hinge_width <= (target+5):
-				print (u'Number of legs : '+str(num_legs)+u'')
-				print (u'Theta of each leg : '+str(math.degrees(theta))+u'°')
-				print (u'Legs clearance : '+str(legs_distance)+u' mm')
-				print (u'Legs length : '+str(legs_length)+u' mm')
-				print (u'Hinge width : '+str(hinge_width)+u' mm\n')
-
-			#print (u'Number of legs : '+str(num_legs)+u'')
-			#print (u'Theta of each leg : '+str(math.degrees(theta))+u'°')
-			#print (u'Legs clearance : '+str(legs_distance)+u' mm')
-			#print (u'Legs length : '+str(legs_length)+u' mm')
-			#print (u'Hinge width : '+str(hinge_width)+u' mm\n')
-
-			num_legs = num_legs+1
-
-	elif variable_option == 2:
-
-		print ("\nFix the width of your hinge in mm : ") #rayon sur une vue de profil de la charnière
-		hinge_width = float(raw_input())
-
-		print ("\nFix the number of torsion legs in mm : ")
-		num_legs = float(raw_input())
-
-		print ("\nFix the thickness of the torsion leg mm : \n") #e sur le schéma Lattice Hinge / b section
-		legs_thickness = float(raw_input())
-
-		print ("\nFix the minimal width of the torsion leg in mm : ") #t sur le schéma Lattice Hinge / h section
-		legs_width = float(raw_input())
-
-		print ("\nFix the step for the torsion legs width in mm : \n") #e sur le schéma Lattice Hinge / b section
-		calculus_step = float(raw_input())
-
-		print ("\nFix the minimum leg clearance you could accept in mm : \n") #e sur le schéma Lattice Hinge / b section
-		tolerance = float(raw_input())
-
-		#############################################
-		######### STEP 3 : CALCULATION OF THE HINGE RADIUS
-		############################################
-
-		hinge_radius = hinge_width/angle
-
-		#############################################
-		######### STEP 4 : CALCULATION OF THE POSSIBILITY OF ROTATION FOR THE TORSION LEG WIDTH
-		############################################
-
-		legs_distance = tolerance+1
-
-		while legs_distance > tolerance:
-
-			theta = angle/num_legs
-			legs_distance = theta*(hinge_radius-(legs_thickness/2)-2*legs_width)
-
-			#############################################
-			######### STEP 5 : CALCULATION OF THE h/b RELATION
-			############################################
-
-			section_dimension = [legs_width, legs_thickness]
-			section_dimension.sort()
-			min_b = section_dimension[0]
-			sup_h = section_dimension[len(section_dimension)-1]
-
-			k_coefficients = sorbetBox.hbRelation(min_b, sup_h)
-			k1 = k_coefficients[0]
-			k2 = k_coefficients[1]
-
-			#############################################
-			######### STEP 6 : CALCULATION OF THE TORSIONNAL LEGS LENGTH
-			#############################################
-
-			legs_length = (k2*shear_modulus*min_b*angle)/(num_legs*k1*shear_stress)
-
-			#############################################
-			######### STEP 7 : DISPLAY THE RESULTS
-			#############################################
-
-			print (u'Number of legs : '+str(num_legs)+u'')
-			print (u'Theta : '+str(math.degrees(theta))+u'°')
-			print (u'Legs clearance : '+str(legs_distance)+u' mm')
-			print (u'Legs length : '+str(legs_length)+u' mm\n')
-
-			legs_width = legs_width+calculus_step
-
-	else:
-		print("ERROR : Please select 1 or 2\n")
