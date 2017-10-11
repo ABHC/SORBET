@@ -25,8 +25,6 @@ def hbRelation(min_b, sup_h):
 
     frac_hb = (sup_h/min_b)
 
-    print (u'\n')
-
     if frac_hb < 11 :
     	frac_hb = round(frac_hb,2)
     	argk = (frac_hb,)

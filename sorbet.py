@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 import sys
+from operator import itemgetter
 
 import modusOperandi
 import sorbetBox
@@ -35,7 +36,7 @@ call_materials.close()
 print ("Choisissez un matériaux")
 
 for line in menu:
-    print (unicode(line[0])+u'. Matériau : '+unicode(line[1])+u', class : '+unicode(line[2])+u'.\n')
+	print (unicode(line[0])+u'. Matériau : '+unicode(line[1])+u', class : '+unicode(line[2])+u'.\n')
 
 material_id = int(raw_input())
 argdb = (material_id,)
@@ -72,7 +73,15 @@ elif modus == 2 :
 
 elif modus == 3 :
 
-	modusOperandi.methodW(G, tau)
+	results_list = modusOperandi.methodW(G, tau)
+	results_list = sorted(results_list, key=itemgetter(0, 1))
+
+	for results in results_list:
+		print (u'delta: '+str(results[0])+u'')
+		print (u'Number of legs : '+str(results[1])+u'')
+		print (u'Theta of each leg : '+str(results[2])+u'°')
+		print (u'Legs length : '+str(results[3])+u' mm')
+		print (u'Hinge width : '+str(results[4])+u' mm\n')
 
 else :
 

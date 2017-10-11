@@ -6,10 +6,10 @@ import math
 import sorbetBox
 
 
-def coreCalculation(angle, G, tau, e, f, k, t, V, W):
+def coreCalculation(results_list, angle, G, tau, e, f, k, t, V, W):
 
 	#############################################
-	######### FIX VALUE
+	######### DEFINE N AND K COEFFICIENTS
 	#############################################
 
 	n = 1
@@ -24,7 +24,7 @@ def coreCalculation(angle, G, tau, e, f, k, t, V, W):
 	k2 = k_coefficients[1]
 
 	#############################################
-	######### RADIUS AND (FISRT) THETA CALCULATION
+	######### RADIUS AND (FIRST) THETA CALCULATION
 	#############################################
 
 	R = (W/angle)
@@ -48,11 +48,8 @@ def coreCalculation(angle, G, tau, e, f, k, t, V, W):
 			l = (V-(2*delta*f)-f)/(2*delta)
 
 			if lmin <= l <= lmax:
-				print (u'delta: '+str(delta)+u'')
-				print (u'Number of legs : '+str(n)+u'')
-				print (u'Theta of each leg : '+str(math.degrees(theta))+u'°')
-				print (u'Legs length : '+str(l)+u' mm')
-				print (u'Hinge width : '+str(W)+u' mm\n')
+				hinge_spec = [delta, n, math.degrees(theta), l, W]
+				results_list.append(hinge_spec)
 
 			delta = delta+1
 
@@ -61,6 +58,12 @@ def coreCalculation(angle, G, tau, e, f, k, t, V, W):
 
 
 def methodW(G, tau):
+
+	#############################################
+	######### DEFINE RESULTS LIST
+	#############################################
+
+	results_list = []
 
 	#############################################
 	######### ASK USER SOME FIXED VALUES
@@ -96,8 +99,10 @@ def methodW(G, tau):
 	W = Wmin
 
 	while W <= Wmax:
-		coreCalculation(angle, G, tau, e, f, k, t, V, W)
+		coreCalculation(results_list, angle, G, tau, e, f, k, t, V, W)
 		W = W+step
+
+	return results_list
 
 
 def classicMethod(shear_modulus, shear_stress):
