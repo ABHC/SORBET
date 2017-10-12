@@ -80,8 +80,10 @@ elif modus == 3 :
 		print (u'delta: '+str(results[0])+u'')
 		print (u'Number of legs : '+str(results[1])+u'')
 		print (u'Theta of each leg : '+str(results[2])+u'°')
-		print (u'Legs length : '+str(results[3])+u' mm')
-		print (u'Hinge width : '+str(results[4])+u' mm\n')
+		print (u'Leg Clearance (k) : '+str(results[3])+u' mm')
+		print (u'Legs length : '+str(results[4])+u' mm')
+		print (u'Lmin : '+str(results[5])+u' mm')
+		print (u'Hinge width : '+str(results[6])+u' mm\n')
 
 else :
 

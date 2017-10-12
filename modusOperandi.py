@@ -6,56 +6,63 @@ import math
 import sorbetBox
 
 
-def coreCalculation(results_list, angle, G, tau, e, f, k, t, V, W):
+def coreCalculation(results_list, angle, G, tau, e, t, V, W):
 
 	#############################################
 	######### DEFINE N AND K COEFFICIENTS
 	#############################################
 
 	n = 1
-
-	section_dimension = [t, e]
-	section_dimension.sort()
-	min_b = section_dimension[0]
-	sup_h = section_dimension[len(section_dimension)-1]
-
-	k_coefficients = sorbetBox.hbRelation(min_b, sup_h)
-	k1 = k_coefficients[0]
-	k2 = k_coefficients[1]
+	k = (W-(n*t))/(n+1)
+	Wmin = (3*k+2*t)
 
 	#############################################
 	######### RADIUS AND (FIRST) THETA CALCULATION
 	#############################################
 
-	R = (W/angle)
-	theta = angle/n
-	lmax = (1./2)*(V-(3*f))
-
 	#############################################
 	######### CHECK IF THE HINGE WIDTH DOESN'T EXCEED THE WITH DEFINED BY USER AND THE POSSIBILITY OF ROTATION
 	#############################################
 
-	while ((n*t)+((n+1)*k)) <= W and ((theta*(R-(e/2)))-(2*t)) >= 0:  # while Wn <= W and kinf >= 0
+	theta = angle/n
+	R = ((n*t)+((n+1)*k))/angle
+	kinf = ((theta*(R-(e/2)))-(2*t))
+
+	while kinf >= 0 and k > 0:  # while Wn <= W and kinf >= 0
+		#print (u'W: '+str(W)+u'')
+		#print (u'n: '+str(n)+u'')
+		#print (u'k: '+str(k)+u'')
+		#print (u'kinf: '+str(kinf)+u'\n')
+
+		section_dimension = [t, e]
+		section_dimension.sort()
+		min_b = section_dimension[0]
+		sup_h = section_dimension[len(section_dimension)-1]
+
+		k_coefficients = sorbetBox.hbRelation(min_b, sup_h)
+		k1 = k_coefficients[0]
+		k2 = k_coefficients[1]
+
+		f = (2*t)+k
 		lmin = (k2*G*min_b*angle)/(n*k1*tau)
+		lmax = (1./2)*(V-(3*f))
 		l = lmin
 		delta = 1
-
-	#############################################
-	######### CHECK IF l DOESN'T EXCEED lmax
-	#############################################
 
 		while l >= lmin:
 			l = (V-(2*delta*f)-f)/(2*delta)
 
 			if lmin <= l <= lmax:
-				hinge_spec = [delta, n, math.degrees(theta), l, W]
+				hinge_spec = [delta, n, math.degrees(theta), k, l, lmin, W]
 				results_list.append(hinge_spec)
 
 			delta = delta+1
 
 		n = n+1
 		theta = angle/n
-
+		R = ((n*t)+((n+1)*k))/angle
+		k = (W-(n*t))/(n+1)
+		Wmin = (3*k+2*t)
 
 def methodW(G, tau):
 
@@ -78,8 +85,8 @@ def methodW(G, tau):
 	print ("\nFix the thickness of the torsion leg (e) in mm : ") #e sur le schéma Lattice Hinge / b section
 	e = float(raw_input())
 
-	print ("\nFix the leg clearance (k) in mm : ") #e sur le schéma Lattice Hinge / b section
-	k = float(raw_input())
+	#print ("\nFix the leg clearance (k) in mm : ") #e sur le schéma Lattice Hinge / b section
+	#k = float(raw_input())
 
 	print ("\nFix the total hinge length (V) in mm : ") #hinge LENGHT : largest side of the hinge plate = V
 	V = float(raw_input())
@@ -93,13 +100,11 @@ def methodW(G, tau):
 	######### Wmin AND f CALCULATION
 	#############################################
 
-	Wmin = (3*k+2*t)
-	f = (2*t)+k
 	step = 0.5
-	W = Wmin
+	W = 0+step
 
 	while W <= Wmax:
-		coreCalculation(results_list, angle, G, tau, e, f, k, t, V, W)
+		coreCalculation(results_list, angle, G, tau, e, t, V, W)
 		W = W+step
 
 	return results_list
