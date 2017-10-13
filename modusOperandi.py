@@ -6,34 +6,13 @@ import math
 import sorbetBox
 
 
-def coreCalculation(results_list, angle, G, tau, e, t, V, W):
+def coreCalculation(results_list, angle, theta, G, tau, e, k, kinf, n, R, t, V, W, Wmin):
 
 	#############################################
 	######### DEFINE N AND K COEFFICIENTS
 	#############################################
 
-	n = 1
-	k = (W-(n*t))/(n+1)
-	Wmin = (3*k+2*t)
-
-	#############################################
-	######### RADIUS AND (FIRST) THETA CALCULATION
-	#############################################
-
-	#############################################
-	######### CHECK IF THE HINGE WIDTH DOESN'T EXCEED THE WITH DEFINED BY USER AND THE POSSIBILITY OF ROTATION
-	#############################################
-
-	theta = angle/n
-	R = ((n*t)+((n+1)*k))/angle
-	kinf = ((theta*(R-(e/2)))-(2*t))
-
-	while kinf >= 0 and k > 0:  # while Wn <= W and kinf >= 0
-		#print (u'W: '+str(W)+u'')
-		#print (u'n: '+str(n)+u'')
-		#print (u'k: '+str(k)+u'')
-		#print (u'kinf: '+str(kinf)+u'\n')
-
+	while kinf >= 0 and k > 0 and t > 0 and theta > 0:
 		section_dimension = [t, e]
 		section_dimension.sort()
 		min_b = section_dimension[0]
@@ -43,17 +22,17 @@ def coreCalculation(results_list, angle, G, tau, e, t, V, W):
 		k1 = k_coefficients[0]
 		k2 = k_coefficients[1]
 
+		delta = 1
 		f = (2*t)+k
 		lmin = (k2*G*min_b*angle)/(n*k1*tau)
 		lmax = (1./2)*(V-(3*f))
 		l = lmin
-		delta = 1
 
 		while l >= lmin:
 			l = (V-(2*delta*f)-f)/(2*delta)
 
 			if lmin <= l <= lmax:
-				hinge_spec = [delta, n, math.degrees(theta), k, l, lmin, W]
+				hinge_spec = [delta, n, math.degrees(theta), k, l, lmin, f, W]
 				results_list.append(hinge_spec)
 
 			delta = delta+1
@@ -62,6 +41,7 @@ def coreCalculation(results_list, angle, G, tau, e, t, V, W):
 		theta = angle/n
 		R = ((n*t)+((n+1)*k))/angle
 		k = (W-(n*t))/(n+1)
+		kinf = ((theta*(R-(e/2)))-(2*t))
 		Wmin = (3*k+2*t)
 
 def methodW(G, tau):
@@ -104,7 +84,14 @@ def methodW(G, tau):
 	W = 0+step
 
 	while W <= Wmax:
-		coreCalculation(results_list, angle, G, tau, e, t, V, W)
+		n = 1
+		theta = angle/n
+		k = (W-(n*t))/(n+1)
+		R = ((n*t)+((n+1)*k))/angle
+		kinf = ((theta*(R-(e/2)))-(2*t))
+		Wmin = (3*k+2*t)
+
+		coreCalculation(results_list, angle, theta, G, tau, e, k, kinf, n, R, t, V, W, Wmin)
 		W = W+step
 
 	return results_list

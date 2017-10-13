@@ -2,6 +2,7 @@
 
 import sys
 from operator import itemgetter
+from math import ceil
 
 import modusOperandi
 import sorbetBox
@@ -15,7 +16,7 @@ database = sorbetBox.databaseConnection()
 ######### STEP 0 : CHOOSE THE MODUS OPERANDI
 ############################################
 
-print ("Welcome to PyHinge ! Please choose choose how to create your lattice hinge :\n")
+print ("Welcome to SORBET ! Please choose choose how to create your lattice hinge :\n")
 print ("1. Create a lattice hinge by minimizing the number of torsional legs required.")
 print ("2. Create a lattice hinge according to its intended radius.")
 print ("3. Create a lattice hinge by minimizing the width of the hinge.\n")
@@ -74,16 +75,99 @@ elif modus == 2 :
 elif modus == 3 :
 
 	results_list = modusOperandi.methodW(G, tau)
-	results_list = sorted(results_list, key=itemgetter(0, 1))
+	results_list = sorted(results_list, key=itemgetter(0, 1, 6))
 
-	for results in results_list:
-		print (u'delta: '+str(results[0])+u'')
-		print (u'Number of legs : '+str(results[1])+u'')
-		print (u'Theta of each leg : '+str(results[2])+u'°')
-		print (u'Leg Clearance (k) : '+str(results[3])+u' mm')
-		print (u'Legs length : '+str(results[4])+u' mm')
-		print (u'Lmin : '+str(results[5])+u' mm')
-		print (u'Hinge width : '+str(results[6])+u' mm\n')
+	print (u'\nNumber of possible models: '+str(len(results_list))+u'\n')
+
+	print ("Want to reduce the number of results by choosing a new discriminating criterion ? : \n0. NO\n1. YES")
+	discrimination = int(raw_input())
+	discrimination = bool(discrimination)
+
+	if discrimination is True:
+		print ("\nChoose the parameters to minimizing :")
+		print ("1. Set mimimum delta.")
+		print ("2. Set minimum number of leg (influences theta)")
+		print ("3. Set minimum leg clearance.")
+
+		discrimination_modus = int(raw_input())
+
+		print ("\nChoose the minimum value : ")
+		mini = float(raw_input())
+
+		mini_results_list = []
+
+		for results in results_list:
+			if discrimination_modus == 1 and results[0] >= int(mini):
+				mini_results_list.append(results)
+
+			if discrimination_modus == 2 and results[1] >= mini:
+				mini_results_list.append(results)
+
+			if discrimination_modus == 3 and results[3] >= mini:
+				mini_results_list.append(results)
+
+		print (u'\nNumber of possible models: '+str(len(mini_results_list))+u'\n')
+
+		print ("Want to reduce the number of results by choosing a new discriminating criterion ? : \n0. NO\n1. YES")
+		discrimination_second = int(raw_input())
+		discrimination_second = bool(discrimination_second)
+
+		if discrimination_second is True:
+			print ("\nChoose the parameters to minimizing :")
+			print ("1. Set mimimum delta.")
+			print ("2. Set minimum number of leg (influences theta)")
+			print ("3. Set minimum leg clearance.")
+
+			discrimination_modus_second = int(raw_input())
+
+			print ("\nChoose the minimum value : ")
+			nano = float(raw_input())
+
+			nano_results_list = []
+
+			for results in mini_results_list:
+				if discrimination_modus_second == 1 and results[0] >= int(nano):
+					nano_results_list.append(results)
+
+				if discrimination_modus_second == 2 and results[1] >= int(nano):
+					nano_results_list.append(results)
+
+				if discrimination_modus_second == 3 and results[3] >= nano:
+					nano_results_list.append(results)
+
+			print (u'\nNumber of possible models: '+str(len(nano_results_list))+u'\n')
+
+			for results in nano_results_list:
+				print (u'delta: '+str(results[0])+u'')
+				print (u'Number of legs : '+str(results[1])+u'')
+				print (u'Theta of each leg : '+str(ceil(100*results[2])/100)+u'°')
+				print (u'Leg Clearance (k) : '+str(ceil(100*results[3])/100)+u' mm')
+				print (u'Legs length : '+str(ceil(100*results[4])/100)+u' mm')
+				print (u'Lmin : '+str(ceil(100*results[5])/100)+u' mm')
+				print (u'Plane Parts : '+str(ceil(100*results[6])/100)+u' mm x '+str(ceil(100*results[6])/100)+u' mm')
+				print (u'Hinge width : '+str(ceil(100*results[7])/100)+u' mm\n')
+
+		elif discrimination_second is False:
+			for results in mini_results_list:
+				print (u'delta: '+str(results[0])+u'')
+				print (u'Number of legs : '+str(results[1])+u'')
+				print (u'Theta of each leg : '+str(ceil(100*results[2])/100)+u'°')
+				print (u'Leg Clearance (k) : '+str(ceil(100*results[3])/100)+u' mm')
+				print (u'Legs length : '+str(ceil(100*results[4])/100)+u' mm')
+				print (u'Lmin : '+str(ceil(100*results[5])/100)+u' mm')
+				print (u'Plane Parts : '+str(ceil(100*results[6])/100)+u' mm x '+str(ceil(100*results[6])/100)+u' mm')
+				print (u'Hinge width : '+str(ceil(100*results[7])/100)+u' mm\n')
+
+	elif discrimination is False:
+		for results in results_list:
+			print (u'delta: '+str(results[0])+u'')
+			print (u'Number of legs : '+str(results[1])+u'')
+			print (u'Theta of each leg : '+str(ceil(100*results[2])/100)+u'°')
+			print (u'Leg Clearance (k) : '+str(ceil(100*results[3])/100)+u' mm')
+			print (u'Legs length : '+str(ceil(100*results[4])/100)+u' mm')
+			print (u'Lmin : '+str(ceil(100*results[5])/100)+u' mm')
+			print (u'Plane Parts : '+str(ceil(100*results[6])/100)+u' mm x '+str(ceil(100*results[6])/100)+u' mm')
+			print (u'Hinge width : '+str(ceil(100*results[7])/100)+u' mm\n')
 
 else :
 
